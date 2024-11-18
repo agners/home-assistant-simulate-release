@@ -12,6 +12,11 @@ on:
         required: false
         type: string
         default: 'homeassistant[]'
+      channel:
+        description: 'Channel'
+        required: false
+        type: string
+        default: 'dev'
       rollout:
         description: 'Generate rollout plan for staged rollouts'
         required: false
@@ -38,7 +43,7 @@ jobs:
               echo "channel=stable" >> "$GITHUB_OUTPUT"
             fi
           else
-            echo "channel=dev" >> "$GITHUB_OUTPUT"
+            echo "channel=${{ inputs.channel }}" >> "$GITHUB_OUTPUT"
           fi
 
   publish_ha:
