@@ -63,7 +63,7 @@ jobs:
       uses: agners/home-assistant-actions/helpers/version-push@master
       with:
         key: ${{ inputs.key }}
-        key-description: "Home Assistant Core"
+        key-description: "Home Assistant ${{ inputs.key }}"
         version: ${{ inputs.version }}
         channel: ${{ needs.init.outputs.channel }}
         rollout: ${{ inputs.rollout }}
@@ -73,7 +73,7 @@ jobs:
       uses: agners/home-assistant-actions/helpers/version-push@master
       with:
         key: ${{ inputs.key }}
-        key-description: "Home Assistant Core"
+        key-description: "Home Assistant ${{ inputs.key }}"
         version: ${{ inputs.version }}
         channel: beta
 
