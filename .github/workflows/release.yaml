@@ -2,6 +2,22 @@ name: Fake release
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version of simulated release'
+        required: true
+        type: string
+      key:
+        description: 'Key for version file update'
+        required: false
+        type: string
+        default: 'homeassistant[]'
+      rollout:
+        description: 'Generate rollout plan for staged rollouts'
+        required: false
+        type: boolean
+        default: false
+ 
   release:
     types: ["published"]
 
@@ -42,17 +58,18 @@ jobs:
     - name: Update version file
       uses: agners/home-assistant-actions/helpers/version-push@master
       with:
-        key: "homeassistant[]"
+        key: ${{ inputs.key }}
         key-description: "Home Assistant Core"
-        version: ${{ needs.init.outputs.version }}
+        version: ${{ inputs.version }}
         channel: ${{ needs.init.outputs.channel }}
+        rollout: ${{ inputs.rollout }}
 
     - name: Update version file (stable -> beta)
       if: needs.init.outputs.channel == 'stable'
       uses: agners/home-assistant-actions/helpers/version-push@master
       with:
-        key: "homeassistant[]"
+        key: ${{ inputs.key }}
         key-description: "Home Assistant Core"
-        version: ${{ needs.init.outputs.version }}
+        version: ${{ inputs.version }}
         channel: beta
 
