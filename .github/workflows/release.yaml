@@ -1,0 +1,58 @@
+name: Fake release
+
+on:
+  workflow_dispatch:
+  release:
+    types: ["published"]
+
+jobs:
+  init:
+    name: Init release
+    runs-on: ubuntu-22.04
+    outputs:
+      channel: ${{ steps.channel.outputs.channel }}
+    steps:
+      - name: Get channel
+        id: channel
+        run: |
+          if [[ "${{ github.event_name }}" == "release" ]]; then
+            if [[ "${{ github.event.release.prerelease }}" == "true" ]]; then
+              echo "channel=beta" >> "$GITHUB_OUTPUT"
+            else
+              echo "channel=stable" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "channel=dev" >> "$GITHUB_OUTPUT"
+          fi
+
+  publish_ha:
+    name: Publish version files
+    environment: ${{ needs.init.outputs.channel }}
+    if: github.repository_owner == 'home-assistant'
+    needs: ["init"]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Initialize git
+      uses: home-assistant/actions/helpers/git-init@master
+      with:
+        name: ${{ secrets.GIT_NAME }}
+        email: ${{ secrets.GIT_EMAIL }}
+        token: ${{ secrets.GIT_TOKEN }}
+
+    - name: Update version file
+      uses: agners/home-assistant-actions/helpers/version-push@master
+      with:
+        key: "homeassistant[]"
+        key-description: "Home Assistant Core"
+        version: ${{ needs.init.outputs.version }}
+        channel: ${{ needs.init.outputs.channel }}
+
+    - name: Update version file (stable -> beta)
+      if: needs.init.outputs.channel == 'stable'
+      uses: agners/home-assistant-actions/helpers/version-push@master
+      with:
+        key: "homeassistant[]"
+        key-description: "Home Assistant Core"
+        version: ${{ needs.init.outputs.version }}
+        channel: beta
+
