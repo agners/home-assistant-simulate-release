@@ -44,7 +44,6 @@ jobs:
   publish_ha:
     name: Publish version files
     environment: ${{ needs.init.outputs.channel }}
-    if: github.repository_owner == 'home-assistant'
     needs: ["init"]
     runs-on: ubuntu-latest
     steps:
