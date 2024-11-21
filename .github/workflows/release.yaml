@@ -68,6 +68,17 @@ jobs:
         channel: ${{ needs.init.outputs.channel }}
         rollout: ${{ inputs.rollout }}
 
+    - name: Update version file (beta -> stable PR)
+      if: needs.init.outputs.channel == 'beta'
+      uses: agners/home-assistant-actions/helpers/version-push@master
+      with:
+        key: ${{ inputs.key }}
+        key-description: "Home Assistant ${{ inputs.key }}"
+        version: ${{ inputs.version }}
+        channel: stable
+        rollout: ${{ inputs.rollout }}
+        create-pr: 'true'
+
     - name: Update version file (stable -> beta)
       if: needs.init.outputs.channel == 'stable'
       uses: agners/home-assistant-actions/helpers/version-push@master
